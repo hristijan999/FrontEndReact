@@ -1,0 +1,20 @@
+/* Header.module.css */
+
+.Dugme {
+    margin-right: 3rem;
+    transition: background 0.3s ease;
+}
+
+.Dugme:hover {
+    background: red;
+}
+
+.fondot {
+    position: relative;
+    font-size: 1.7rem;
+}
+
+.logo {
+    width: 300px;
+    height: auto;
+}

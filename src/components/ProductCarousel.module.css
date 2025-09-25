@@ -1,0 +1,28 @@
+
+:global(.carousel-indicators) {
+
+    bottom: -2rem;
+}
+
+:global(.carousel-indicators [data-bs-target]) {
+    width: 20px;
+    height: 5px;
+    border-radius: 30%;
+    border: none;
+    margin: 0 6px;
+    background: #9e9e9e;
+    transition: transform .25s, opacity .25s;
+}
+
+:global(.carousel-indicators .active) {
+    background: black;
+    opacity: 1;
+    transform: translateY(-3px) scale(1.2);
+}
+
+/*ne rabottit nz zs*/
+:global(.carousel-control-prev-icon,
+.carousel-control-next-icon) {
+    filter: invert(100%);
+
+}
