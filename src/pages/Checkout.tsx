@@ -46,7 +46,7 @@ const Checkout: React.FC = () => {
 
 
         return cart.map(item => (
-            <div key={item.id} className="mb-2 d-flex align-items-center">
+            <div key={item.id} className="mb-2 d-flex align-items-center table-active">
                 <img
                     src={item.lista_Sliki[0]}
                     alt={item.opis}

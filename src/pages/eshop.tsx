@@ -1,14 +1,15 @@
-
 import React, { useState, useEffect } from "react";
 import { useFetchAll } from "../hooks/useMerche";
-import { Row, Col, Container, Card, Form, Pagination, Button } from "react-bootstrap";
+import { Row, Col, Container, Card, Form, Pagination } from "react-bootstrap";
 import styles from "./Eshop.module.css";
 import ProductCarousel from "../components/ProductCarousel";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import SliderSizes from "../components/PriceSlider";
 import Footer from "../components/Footer";
-import axios from "axios";
+import { useUser } from "../hooks/useUser.ts";
+import { deleteGrub } from "../api/AdminApi";
+import Chat from "../components/Chat.tsx";
 
 interface Roba {
     id: number;
@@ -28,10 +29,13 @@ const Eshop = () => {
     const [size] = useState(6);
     const [totalPages, setTotalPages] = useState(1);
 
+    const { user } = useUser();
+    const isAdmin = user && user.roles?.includes("ROLE_ADMIN");
+
     const { data, isLoading, isError } = useFetchAll(page, size);
-    const prices = data?.content?.map(
-        (p: Roba) => (p.popust ? p.cenaSoPopust : p.price)
-    ) || [];
+    const prices =
+        data?.content?.map((p: Roba) => (p.popust ? p.cenaSoPopust : p.price)) ||
+        [];
 
     useEffect(() => {
         if (data) {
@@ -39,11 +43,23 @@ const Eshop = () => {
         }
     }, [data]);
 
-
+    const handleAdminAction = async (product: Roba) => {
+        // Ask for confirmation before deleting
+        const confirmed = window.confirm(`Are you sure you want to delete the product "${product.type}" (ID: ${product.id})?`);
+        if (!confirmed) return;
+        try {
+            await deleteGrub(product.id);
+            alert("Product deleted!");
+            // optionally, refresh your products list here!
+        } catch (_err) {
+            alert("Failed to delete product.");
+        }
+    };
 
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
 
+    const [selectedGender, setSelectedGender] = useState<string | null>(null);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]);
 
@@ -100,29 +116,57 @@ const Eshop = () => {
         <Card className={`${styles.filter} p-3 sticky-top`}>
             <h5>Filter Products</h5>
             <Form>
-                <Form.Group controlId="categoryFilter">
-                    <Form.Label>Category</Form.Label>
-                    {["sako", "kostum", "fustan"].map((category) => (
-                        <Form.Check
-                            key={category}
-                            type="checkbox"
-                            label={category}
-                            checked={selectedCategories.includes(category)}
-                            onChange={(e) => {
-                                if (e.target.checked) {
-                                    setSelectedCategories((prev) => [
-                                        ...prev,
-                                        category,
-                                    ]);
-                                } else {
-                                    setSelectedCategories((prev) =>
-                                        prev.filter((c) => c !== category)
-                                    );
-                                }
-                            }}
-                        />
-                    ))}
+                <Form.Group controlId="genderFilter">
+                    <Form.Label>Gender</Form.Label>
+                    <Form.Check
+                        type="radio"
+                        label="Male"
+                        name="gender"
+                        checked={selectedGender === "male"}
+                        onChange={() => {
+                            setSelectedGender("male");
+                            setSelectedCategories([]);
+                        }}
+                    />
+                    <Form.Check
+                        type="radio"
+                        label="Female"
+                        name="gender"
+                        checked={selectedGender === "female"}
+                        onChange={() => {
+                            setSelectedGender("female");
+                            setSelectedCategories([]);
+                        }}
+                    />
                 </Form.Group>
+                {selectedGender && (
+                    <Form.Group controlId="categoryFilter" className="mt-3">
+                        <Form.Label>Category</Form.Label>
+                        {(selectedGender === "male"
+                                ? ["sako", "kostum","konduri","vratovrski"]
+                                : ["fustan", "sako","nevestinski fustan"]
+                        ).map((category) => (
+                            <Form.Check
+                                key={category}
+                                type="checkbox"
+                                label={category}
+                                checked={selectedCategories.includes(category)}
+                                onChange={(e) => {
+                                    if (e.target.checked) {
+                                        setSelectedCategories((prev) => [
+                                            ...prev,
+                                            category,
+                                        ]);
+                                    } else {
+                                        setSelectedCategories((prev) =>
+                                            prev.filter((c) => c !== category)
+                                        );
+                                    }
+                                }}
+                            />
+                        ))}
+                    </Form.Group>
+                )}
                 <Form.Group controlId="priceFilter" className="mt-3">
                     <Form.Label>Price Range</Form.Label>
                     <SliderSizes
@@ -146,7 +190,6 @@ const Eshop = () => {
             <Row>
                 <Col xs="auto">
                     <FilterPanel />
-
                 </Col>
                 <Col>
                     <Row xs="auto" className="g-4">
@@ -172,6 +215,26 @@ const Eshop = () => {
                                         </Card.Subtitle>
                                     </Card.Body>
                                 </Card>
+                                {isAdmin && (
+                                    <>
+                                        <button
+                                            className="btn btn-danger mt-2"
+                                            onClick={() => handleAdminAction(product)}
+                                        >
+                                            Delete Product
+                                        </button>
+                                        <button
+                                            className="btn btn-info mt-2"
+                                            onClick={() =>
+                                                navigate("/AdminEdit", {
+                                                    state: { product, filteredProducts },
+                                                })
+                                            }
+                                        >
+                                            Edit Product
+                                        </button>
+                                    </>
+                                )}
                             </Col>
                         ))}
                         {filteredProducts.length === 0 && (
@@ -187,6 +250,7 @@ const Eshop = () => {
                 </Col>
             </Row>
             <Footer />
+            <Chat />
         </Container>
     );
 };

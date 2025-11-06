@@ -1,0 +1,21 @@
+/* Responsive horizontal scroll with scroll snap */
+.scrolling-wrapper {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 1.25rem;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 1rem;
+}
+.scroll-card {
+    flex: 0 0 260px;
+    scroll-snap-align: start;
+    min-width: 220px;
+    max-width: 100vw;
+}
+@media (max-width: 600px) {
+    .scroll-card {
+        flex-basis: 80vw;
+    }
+}

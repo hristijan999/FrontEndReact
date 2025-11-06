@@ -1,12 +1,16 @@
 /* Header.module.css */
-
+.navigacija{
+    position: relative;
+    width: 100%;
+    height: auto;
+}
 .Dugme {
     margin-right: 3rem;
     transition: background 0.3s ease;
 }
 
 .Dugme:hover {
-    background: red;
+    /*background: red;*/
 }
 
 .fondot {
@@ -15,6 +19,13 @@
 }
 
 .logo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     width: 300px;
     height: auto;
+}
+.korpa{
+    margin-right: 1rem;
 }

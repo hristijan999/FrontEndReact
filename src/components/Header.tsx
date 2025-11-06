@@ -6,7 +6,10 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import styles from "./Header.module.css";
 
 import Korpa from "./Korpa";
-import { useUser } from '../context/UserContext';
+import { useUser } from '../hooks/useUser';
+
+
+
 interface HeaderProps {
     flag?: boolean; // optional
 }
@@ -14,12 +17,12 @@ const Header:React.FC<HeaderProps> = ({flag}) => {
 
     const SomeComponent = () => {
         const { user } = useUser();
-        return <div>Welcome, {user?.username} {user?.roles}</div>;
+        return <div className={`m-4`}>Welcome, {user?.username} {user?.roles}</div>;
     };
     const navigate = useNavigate();
 
     return (
-        <Navbar bg="light" variant="light" expand="xl" className="mb-4 shadow-sm">
+        <Navbar bg="light" variant="light" expand="xl" className={`mb-4 shadow-sm ${styles.navigacija}`}>
             <Container fluid className="d-flex justify-content-between align-items-center">
                 {/* Centered Logo */}
                 <Nav
@@ -36,19 +39,19 @@ const Header:React.FC<HeaderProps> = ({flag}) => {
 
                 {/*login button*/}
                 <Nav>
-                    <SomeComponent />
+                    < SomeComponent />
                     <Button
                         className={`me-3 ${styles.Dugme}`}
-                        variant="outline-secondary"
+                        variant="btn btn-outline-success"
                         onClick={() => navigate("/logIn")}
                     >
                         <i className={`bi bi-person ${styles.fondot}`}></i>
                     </Button>
                 </Nav>
 
-                {/* Basket Button */}
-                <Nav>
-                    <Korpa flag={flag}
+
+                <Nav className={`${styles.korpa}`}>
+                    <Korpa  flag={flag}
                     />
                 </Nav>
 
